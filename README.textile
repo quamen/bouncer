@@ -37,6 +37,8 @@ end
 
 Now you can safely use <code> User.new(params[:user])</code> in your controller to mass assign only the attributes you've said are safe.
 
+You should use allow_assignment in every controller within your application. By default bouncer will strip everything from the params hash that isn't required by rails to operate.
+
 Why Not Use attr_accessible?
 ==========================
 
@@ -74,3 +76,5 @@ end
 </pre>
 
 Copyright (c) 2009 Gareth Townsend, released under the MIT license
+
+Thanks to Josh Bassett for helping nut out <code>self.request.env['rack.routing_args'].keys</code> and other refactorings.
