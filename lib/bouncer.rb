@@ -1,16 +1,19 @@
 # Bouncer
-
 class ActionController::Base
   before_filter :cache_params_hash
   
-  def self.allow_assignment(*assignable_attributes_hash)    
-    assignable_attributes_hash.each do |attribute_hash|
-      attribute_hash.keys.each do |key|
-        before_filter { |controller| controller.send(:slice_attributes_for, key, attribute_hash[key]) }
+  def self.allow_params(*param_sets)
+    param_sets.each do |param|
+      if param.respond_to? :to_sym
+        before_filter { |controller| controller.send(:slice_attribute, param)}
+      elsif
+        param.keys.each do |key|
+          before_filter { |controller| controller.send(:slice_attributes_for, key, param[key]) }
+        end
       end
     end
   end
-  
+
   private
   
   def cache_params_hash
@@ -20,10 +23,17 @@ class ActionController::Base
     params.slice!(*keys)
   end
 
-  def slice_attributes_for(params_hash_symbol, assignable_attributes)
-    if @cached_params_hash[params_hash_symbol]
-      allowed_attributes = @cached_params_hash[params_hash_symbol].slice(*assignable_attributes) 
-      params[params_hash_symbol] = allowed_attributes
+  def slice_attribute(param_key)
+    if @cached_params_hash[param_key]
+      allowed_attribute = @cached_params_hash[param_key]
+      params[param_key] = allowed_attribute
+    end
+  end
+  
+  def slice_attributes_for(param_key, assignable_attributes)
+    if @cached_params_hash[param_key]
+      allowed_attributes = @cached_params_hash[param_key].slice(*assignable_attributes) 
+      params[param_key] = allowed_attributes
     end
   end
 end
